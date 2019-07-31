@@ -11,6 +11,7 @@ class App extends React.Component {
             showAssignmentsForShift: false,
             shiftDetail: {},
             totalShiftsNeeded: 0,
+            totalShifts: 0,
         }
     }
 
@@ -19,15 +20,13 @@ class App extends React.Component {
     }
 
     render() {
-        const {thursdayShifts, fridayShifts, showAssignmentsForShift, shiftDetail, totalShiftsNeeded} = this.state
+        const {thursdayShifts, fridayShifts, showAssignmentsForShift, shiftDetail, totalShiftsNeeded, totalShifts} = this.state
 
         return (
             <div className="page">
-
-                <h3>admin</h3>
-                <h1>Develop Denver 2019</h1>
-                <h2>Shifts available: {totalShiftsNeeded}</h2>
-
+                <h2 className="tagline">Admin View</h2>
+                <h1>Dvlp Dnvr 2019: volunteer</h1>
+                <h3>{totalShifts} total shifts >>> {totalShiftsNeeded} available shifts</h3>
                 {showAssignmentsForShift ? <React.Fragment>
                         <button onClick={this.closeDetail}>back</button>
                         <h2>{`${shiftDetail.shift.day}: ${App.formatTime(shiftDetail.shift.hourStart)}`}</h2>
@@ -37,14 +36,14 @@ class App extends React.Component {
                             </tbody>
                         </table>
                     </React.Fragment> : <React.Fragment>
-                        <h1>Thursday August 15th</h1>
+                        <h2>Thursday August 15th</h2>
                         <table>
                             <tbody>
                             {this.getRows(thursdayShifts)}
                             </tbody>
                         </table>
 
-                        <h1>Friday August 16th</h1>
+                        <h2>Friday August 16th</h2>
                         <table>
                             <tbody>
                             {this.getRows(fridayShifts)}
@@ -52,8 +51,6 @@ class App extends React.Component {
                         </table>
                     </React.Fragment>
                 }
-
-
             </div>
         )
     }
@@ -61,7 +58,7 @@ class App extends React.Component {
     getRows(shifts) {
         return shifts.map((shift, i) => {
             return (
-                <tr key={i} onClick={() => this.expandWithAssignments(shift)}>
+                <tr className={(shift.available === 0 ? 'full' : null)} key={i} onClick={() => this.expandWithAssignments(shift)}>
                     <td>{App.formatTime(shift.shift.hourStart)}</td>
                     <td>{shift.available} needed</td>
                     <td>{shift.shift.totalSlots - shift.available} filled</td>
@@ -74,12 +71,17 @@ class App extends React.Component {
         const response = await fetch("https://volunteer.apps.pcfone.io/api/shifts")
         const shifts = await response.json()
         let totalAvailable = 0
+        let totalShifts = 0
 
-        shifts.forEach(shift => totalAvailable += shift.available)
+        shifts.forEach(shift => {
+            totalAvailable += shift.available
+            totalShifts += shift.shift.totalSlots
+        })
         this.setState({
             thursdayShifts: shifts.filter(shift => shift.shift.day === "Thursday"),
             fridayShifts: shifts.filter(shift => shift.shift.day === "Friday"),
-            totalShiftsNeeded: totalAvailable
+            totalShiftsNeeded: totalAvailable,
+            totalShifts: totalShifts
         })
 
     }
