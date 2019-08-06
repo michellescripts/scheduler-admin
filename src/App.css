@@ -24,6 +24,7 @@ button {
   width: 100%;
   background: none;
   padding: 10px;
+  margin: 10px;
 }
 
 button:hover {
@@ -92,8 +93,12 @@ table button {
   font-size: 1rem;
 }
 
-.full td {
+.full td, .fullShifts td {
   color: #3dae2b;
+}
+
+.noShifts td {
+  color: palegoldenrod;
 }
 
 .tagline {
